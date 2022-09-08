@@ -18,6 +18,7 @@
 //! 
 
 use std::io::Write;
+use std::sync::{Arc, Mutex};
 
 ///
 /// The surface struct stores data relative to the render image
@@ -29,7 +30,7 @@ use std::io::Write;
 pub struct Surface {
     pub width: u32,
     pub height: u32,
-    buffer: Vec<(u8, u8, u8)>, // Could use array width const width and fov
+    pub buffer: Arc<Mutex<Vec<u32>>>, // Could use array width const width and fov
     output_file: String,
 }
 
@@ -41,7 +42,7 @@ impl Surface {
             width, 
             height, 
             //buffer: Vec::<(u8, u8, u8)>::with_capacity((width*height) as usize),
-            buffer: vec![(0, 0, 0); (width*height) as usize],
+            buffer: Arc::new(Mutex::new(vec![0; (width*height) as usize])),
             output_file: output_file.clone(), 
         }
     }
@@ -51,7 +52,7 @@ impl Surface {
         Surface { 
             width: default_size.0, 
             height: default_size.1, 
-            buffer: Vec::<(u8, u8, u8)>::with_capacity((default_size.0*default_size.1) as usize),
+            buffer: Arc::new(Mutex::new(Vec::<u32>::with_capacity((default_size.0*default_size.1) as usize))),
             output_file: String::from("render"), 
         }
     }
@@ -110,11 +111,12 @@ impl Surface {
     }
 
     pub fn get_val(&self, i: u32, j: u32) -> (u8, u8, u8) {
-        self.buffer[(i + j*self.width) as usize]
+        let val = (*self.buffer.lock().unwrap())[(i + j*self.width) as usize];
+        ((val >> 16) as u8, (val >> 8) as u8, val as u8)
     }
 
     pub fn set_val(&mut self, i: u32, j: u32, v: (u8, u8, u8)) {
-        self.buffer[(i + j*self.width) as usize] = v;
+        (*self.buffer.lock().unwrap())[(i + j*self.width) as usize] = ((v.0 as u32) << 16) + ((v.1 as u32) << 8) + v.2 as u32;
     }
     
 }

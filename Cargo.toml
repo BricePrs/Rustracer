@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 linear_alg = { path = "../linear_alg" }
 "rand" = "0.8.4"
+minifb = "0.23"

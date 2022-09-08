@@ -17,12 +17,12 @@ fn main() {
         Vec3::new(-7.0, 0.5, 2.0),
         Vec3::new(0, 0., 0.),
         30.,
-        1500,
+        700,
         0.6,
-        length(Vec3::new(-7.0, 0.5, 2.0))-1.5,
+        length(Vec3::new(-7.0, 0.5, 2.0))-1.3,
         0.13456789,
-        150,
-        250
+        50,
+        100
     );
     
     camera.surface.save_to(&String::from("render.ppm"));
@@ -63,8 +63,10 @@ fn main() {
     world.add(glass_sphere);
     world.add(mirror_sphere);
 
+    //display window to show computing progress
+    camera.display_progress();
     // Render scene
-    camera.capture_image(world);
+    camera.capture_image_snail(world);
 
     // Write to file
     camera.export()
